@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+data/train_data.csv
+data/val_data.csv
+data/trained_model.npz
