@@ -11,8 +11,9 @@ if __name__ == "__main__":
     parser.add_argument('--predict', action='store_true')
     
     # hyperparameters
-    parser.add_argument('--epochs', type=int, default=10000, help="Epochs number for training")
+    parser.add_argument('--epochs', type=int, default=100, help="Epochs number for training")
     parser.add_argument('--learning_rate', type=float, default=0.1, help="Learning rate for gradient descent")
+    parser.add_argument('--batch_size', type=int, default=8, help="Batch size for training")
     parser.add_argument('--layer', type=int, nargs='+', default=[24, 24], help="Hidden layer sizes (e.g. --layer 24 24)")
     parser.add_argument('--loss', type=str, default='binaryCrossentropy',
                         choices=['binaryCrossentropy', 'categoricalCrossentropy'], help="Loss function")
@@ -22,7 +23,7 @@ if __name__ == "__main__":
         split_dataset()
     elif args.train:
         print(f"Training for {args.epochs} epochs with LR: {args.learning_rate}...")
-        train_network(epochs=args.epochs, lr=args.learning_rate, hlayers = args.layer, loss_name=args.loss)
+        train_network(epochs=args.epochs, lr=args.learning_rate, hlayers = args.layer, loss_name=args.loss, batch_s = args.batch_size)
     elif args.predict:
         print("Predicting results...")
         make_pred()
