@@ -3,6 +3,7 @@ import numpy as np
 from core.network import Network
 from core.losses import loss_function
 from plots import plot_learn_curves
+from bonus.early_stop import EarlyStop
 
 def load_data(path):
     data = np.genfromtxt(path, dtype = float, delimiter=',')
@@ -24,6 +25,8 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s):
 
     hist = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
 
+    stopper = EarlyStop()
+
     for epoch in range(epochs):
 
         order = np.random.permutation(len(train_data))
@@ -34,7 +37,6 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s):
             y_batch = train_labels[batch_indx]
 
             new_data = model.forward(x_batch)
-            loss_function(y_batch, new_data, loss_name)
             model.backward(y_batch, new_data)
             for layer in model.layers: layer.update_params(lr)
 
@@ -49,6 +51,9 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s):
         hist["val_acc"].append(accuracy(val_labels, val_output))
 
         print(f"epoch {epoch + 1}/{epochs} - loss: {loss:.4f} - val_loss: {val_loss:.4f}")
+        
+        if stopper.check(val_loss, model): break
 
+    stopper.restore(model) 
     model.save('data/trained_model.npz')
     plot_learn_curves(hist)
