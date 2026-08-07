@@ -17,13 +17,18 @@ if __name__ == "__main__":
     parser.add_argument('--layer', type=int, nargs='+', default=[24, 24], help="Hidden layer sizes (e.g. --layer 24 24)")
     parser.add_argument('--loss', type=str, default='binaryCrossentropy',
                         choices=['binaryCrossentropy', 'categoricalCrossentropy'], help="Loss function")
+
+    # bonus
+    parser.add_argument('--early_stop', action='store_true', help="Stop early once validation loss stops improving")
+    parser.add_argument('--patience', type=int, default=30, help="Epochs without improvement tolerated by --early_stop")
     args = parser.parse_args()
 
     if args.split:
         split_dataset()
     elif args.train:
         print(f"Training for {args.epochs} epochs with LR: {args.learning_rate}...")
-        train_network(epochs=args.epochs, lr=args.learning_rate, hlayers = args.layer, loss_name=args.loss, batch_s = args.batch_size)
+        train_network(epochs=args.epochs, lr=args.learning_rate, hlayers = args.layer, loss_name=args.loss, batch_s = args.batch_size,
+                      early_stop=args.early_stop, patience=args.patience)
     elif args.predict:
         print("Predicting results...")
         make_pred()

@@ -16,7 +16,7 @@ def load_data(path):
 def accuracy(y_true, y_pred):
     return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))
 
-def train_network(epochs, lr, hlayers, loss_name, batch_s):
+def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, patience=30):
     np.random.seed(42)
     model = Network(hlayers)
 
@@ -25,7 +25,8 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s):
 
     hist = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
 
-    stopper = EarlyStop()
+    # bonus: off by default so --epochs always means exactly that many epochs
+    stopper = EarlyStop(patience) if early_stop else None
 
     for epoch in range(epochs):
 
@@ -52,8 +53,13 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s):
 
         print(f"epoch {epoch + 1}/{epochs} - loss: {loss:.4f} - val_loss: {val_loss:.4f}")
         
-        if stopper.check(val_loss, model): break
+        if stopper and stopper.check(val_loss, model):
+            print(f"early stopping: no improvement for {patience} epochs")
+            break
 
-    stopper.restore(model) 
+    if stopper:
+        stopper.restore(model)
+        print(f"restored best weights (val_loss: {stopper.best_loss:.4f})")
+
     model.save('data/trained_model.npz')
     plot_learn_curves(hist)
