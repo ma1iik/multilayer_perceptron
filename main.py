@@ -3,6 +3,20 @@ from split import split_dataset
 from train import train_network
 from predict import make_pred
 
+def check_hyperparams(args):
+    if args.epochs < 1:
+        raise SystemExit("--epochs must be at least 1")
+    if args.learning_rate <= 0:
+        raise SystemExit("--learning_rate must be greater than 0")
+    if args.batch_size < 1:
+        raise SystemExit("--batch_size must be at least 1")
+    if args.patience < 1:
+        raise SystemExit("--patience must be at least 1")
+    if any(size < 1 for size in args.layer):
+        raise SystemExit("--layer sizes must all be at least 1")
+    if len(args.layer) < 2:
+        print(f"warning: {len(args.layer)} hidden layer, the subject asks for at least two")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Multilayer Perceptron from Scratch")
     
@@ -26,6 +40,7 @@ if __name__ == "__main__":
     if args.split:
         split_dataset()
     elif args.train:
+        check_hyperparams(args)
         print(f"Training for {args.epochs} epochs with LR: {args.learning_rate}...")
         train_network(epochs=args.epochs, lr=args.learning_rate, hlayers = args.layer, loss_name=args.loss, batch_s = args.batch_size,
                       early_stop=args.early_stop, patience=args.patience)
