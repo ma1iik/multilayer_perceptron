@@ -24,7 +24,6 @@ class Network:
             error = layer.backward(error)
         return error
     
-    # !!!
     def save(self, filename="model.npz"):
         params = {}
 

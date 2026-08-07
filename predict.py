@@ -12,8 +12,6 @@ def make_pred():
     output = model.forward(val_data)
     predictions = np.argmax(output, axis=1)
     true_indices = np.argmax(val_labels, axis=1)
-    print(predictions)
-    print(true_indices)
 
     matches = (predictions == true_indices)
     accur = np.mean(matches) * 100

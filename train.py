@@ -23,10 +23,15 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, pat
     train_data, train_labels = load_data("data/train_data.csv")
     val_data, val_labels = load_data("data/val_data.csv")
 
+    print(f"x_train shape : {train_data.shape}")
+    print(f"x_valid shape : {val_data.shape}")
+
     hist = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
 
     # bonus: off by default so --epochs always means exactly that many epochs
     stopper = EarlyStop(patience) if early_stop else None
+
+    width = len(str(epochs))  # pad the epoch counter so the column stays aligned
 
     for epoch in range(epochs):
 
@@ -54,7 +59,7 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, pat
         hist["acc"].append(acc)
         hist["val_acc"].append(val_acc)
 
-        print(f"epoch {epoch + 1}/{epochs} - loss: {loss:.4f} - val_loss: {val_loss:.4f}"
+        print(f"epoch {epoch + 1:0{width}d}/{epochs} - loss: {loss:.4f} - val_loss: {val_loss:.4f}"
               f" - acc: {acc:.4f} - val_acc: {val_acc:.4f}")
         
         if stopper and stopper.check(val_loss, model):
