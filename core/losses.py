@@ -8,7 +8,7 @@ def categorical_cross_entropy(y_true, y_pred):
     return - np.mean(np.sum(y_true * np.log(y_pred), axis=1))
 
 def loss_function(y_true, y_pred, name="binaryCrossentropy"):
-    # Stop y_pred from ever being exactly 0.0 or 1.0
+    # never let y_pred hit exactly 0.0 or 1.0
     y_pred = np.clip(y_pred, 1e-15, 1 - 1e-15)
 
     if name == "binaryCrossentropy":

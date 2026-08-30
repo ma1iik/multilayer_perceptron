@@ -2,8 +2,11 @@ import numpy as np
 
 from core.network import Network
 from core.losses import loss_function
-from plots import plot_learn_curves
+from phases.plots import plot_learn_curves
 from bonus.early_stop import EarlyStop
+from bonus.history import save_history
+from bonus.metrics import all_metrics, print_report
+from bonus.optimizers import make_optimizer
 
 def load_data(path):
     data = np.genfromtxt(path, dtype = float, delimiter=',')
@@ -16,9 +19,11 @@ def load_data(path):
 def accuracy(y_true, y_pred):
     return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))
 
-def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, patience=30):
+def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, patience=30,
+                  optimizer_name="sgd"):
     np.random.seed(42)
     model = Network(hlayers)
+    optimizer = make_optimizer(optimizer_name, lr)
 
     train_data, train_labels = load_data("data/train_data.csv")
     val_data, val_labels = load_data("data/val_data.csv")
@@ -26,12 +31,13 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, pat
     print(f"x_train shape : {train_data.shape}")
     print(f"x_valid shape : {val_data.shape}")
 
-    hist = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
+    hist = {"loss": [], "val_loss": [], "acc": [], "val_acc": [],
+            "val_precision": [], "val_recall": [], "val_f1": []}
 
-    # bonus: off by default so --epochs always means exactly that many epochs
+    # bonus, oof by def
     stopper = EarlyStop(patience) if early_stop else None
 
-    width = len(str(epochs))  # pad the epoch counter so the column stays aligned
+    width = len(str(epochs))  # zero-pad the epoch counter
 
     for epoch in range(epochs):
 
@@ -44,7 +50,7 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, pat
 
             new_data = model.forward(x_batch)
             model.backward(y_batch, new_data)
-            for layer in model.layers: layer.update_params(lr)
+            optimizer.step(model.layers)
 
         val_output = model.forward(val_data)
         train_output = model.forward(train_data)
@@ -59,6 +65,12 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, pat
         hist["acc"].append(acc)
         hist["val_acc"].append(val_acc)
 
+        # bonus
+        val_metrics = all_metrics(val_labels, val_output)
+        hist["val_precision"].append(val_metrics["precision"])
+        hist["val_recall"].append(val_metrics["recall"])
+        hist["val_f1"].append(val_metrics["f1"])
+
         print(f"epoch {epoch + 1:0{width}d}/{epochs} - loss: {loss:.4f} - val_loss: {val_loss:.4f}"
               f" - acc: {acc:.4f} - val_acc: {val_acc:.4f}")
         
@@ -71,4 +83,21 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, pat
         print(f"restored best weights (val_loss: {stopper.best_loss:.4f})")
 
     model.save('data/trained_model.npz')
+
+    print("\nvalidation set:")
+    print_report(val_labels, model.forward(val_data))
+    print()
+
+    # bonus
+    save_history(hist, {
+        "layers": list(hlayers),
+        "learning_rate": lr,
+        "batch_size": batch_s,
+        "epochs": epochs,
+        "loss": loss_name,
+        "optimizer": optimizer_name,
+        "early_stop": early_stop,
+        "patience": patience,
+    })
+
     plot_learn_curves(hist)

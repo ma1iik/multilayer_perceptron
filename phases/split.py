@@ -13,7 +13,7 @@ def split_dataset():
     # M/B to 1/0
     data[:, 1] = np.where(data[:, 1] == 'M', '1', '0')
 
-    #  data type to float
+    # to float
     data = data.astype(float)
 
     # random shuffling
@@ -28,7 +28,7 @@ def split_dataset():
 
     # data normalisation (col 0 is the label, cols 1: are the 30 features)
     features = train_data[:, 1:]
-    col_min = np.min(features, axis=0) #axis 0 to look accros a col, axis 1 to look across the row
+    col_min = np.min(features, axis=0)  # axis 0 walks down the columns
     col_max = np.max(features, axis=0)
 
     train_data[:, 1:] = (features - col_min) / (col_max - col_min + 1e-8)
@@ -38,3 +38,6 @@ def split_dataset():
 
     np.savetxt('data/train_data.csv', train_data, delimiter=',')
     np.savetxt('data/val_data.csv', val_data, delimiter=',')
+
+    # predict needs these
+    np.savez('data/norm_params.npz', col_min=col_min, col_max=col_max)

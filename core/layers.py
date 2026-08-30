@@ -3,7 +3,6 @@ from core.activations import sigmoid, softmax
 
 class DenseLayer:
     def __init__(self, input_size, num_neurons, activation="sigmoid"):
-        #scale down so  weighted sums don't saturate sigmoid at start (xavier init)
         self.weights = np.random.randn(input_size, num_neurons) * np.sqrt(1 / input_size)
         self.biases = np.zeros((1, num_neurons))
         self.activation = activation;

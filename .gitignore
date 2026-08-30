@@ -4,6 +4,14 @@ __pycache__/
 # macOS
 .DS_Store
 
+# everything generated
 data/train_data.csv
 data/val_data.csv
 data/trained_model.npz
+data/norm_params.npz
+data/data_training.csv
+data/data_test.csv
+data/history/
+data/learning_curves.png
+
+evaluation.py
