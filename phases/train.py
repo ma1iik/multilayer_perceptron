@@ -20,8 +20,12 @@ def accuracy(y_true, y_pred):
     return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))
 
 def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, patience=30,
-                  optimizer_name="sgd"):
-    np.random.seed(42)
+                  optimizer_name="sgd", seed=None):
+    # random unless asked, so repeated runs converge to different solutions
+    if seed is None:
+        seed = np.random.randint(0, 2 ** 31 - 1)
+    np.random.seed(seed)
+    print(f"seed: {seed}")
     model = Network(hlayers)
     optimizer = make_optimizer(optimizer_name, lr)
 
@@ -96,6 +100,7 @@ def train_network(epochs, lr, hlayers, loss_name, batch_s, early_stop=False, pat
         "epochs": epochs,
         "loss": loss_name,
         "optimizer": optimizer_name,
+        "seed": seed,
         "early_stop": early_stop,
         "patience": patience,
     })

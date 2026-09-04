@@ -44,6 +44,5 @@ class Network:
         for i, layer in enumerate(model.layers):
             layer.weights = saved[f"w{i}"]
             layer.biases = saved[f"b{i}"]
-            
-        print("Network loaded!")
+       
         return model

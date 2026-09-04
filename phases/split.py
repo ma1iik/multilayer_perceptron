@@ -1,11 +1,11 @@
 import numpy as np
 
 
-def split_dataset():
-    print("Shuffling and splitting data...")
+def split_dataset(dataset='data/data.csv'):
+    print(f"Shuffling & splitting {dataset}...")
 
     data = np.genfromtxt(
-        'data/data.csv',
+        dataset,
         delimiter=',',
         dtype=str,
     )
