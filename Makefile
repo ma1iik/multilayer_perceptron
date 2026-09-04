@@ -1,4 +1,4 @@
-PYTHON := python
+PYTHON := python3
 
 CACHE     := $(shell find . -name __pycache__ -type d)
 GENERATED := data/train_data.csv data/val_data.csv data/norm_params.npz \
